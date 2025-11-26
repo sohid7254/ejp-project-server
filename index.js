@@ -34,29 +34,37 @@ async function run() {
             res.send(result);
         });
 
-        // ✅ Get all products (with optional search by title)
+        // Get all products (with optional search by title)
         app.get("/allproducts", async (req, res) => {
-            const search = req.query.search || ""; 
+            const search = req.query.search || "";
             let query = {};
 
             if (search) {
                 query = { title: { $regex: search, $options: "i" } };
-                
             }
 
             const result = await productsCollection.find(query).toArray();
             res.send(result);
         });
+
         // get product details by id
         app.get("/product/:id", async (req, res) => {
             const id = req.params.id;
             const product = await productsCollection.findOne({ _id: new ObjectId(id) });
             res.json(product);
         });
-        // add product from client 
+
+        // add product from client
         app.post("/addProduct", async (req, res) => {
             const product = req.body;
             const result = await productsCollection.insertOne(product);
+            res.json(result);
+        });
+
+        //  Delete product
+        app.delete("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
             res.json(result);
         });
 
