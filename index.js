@@ -3,7 +3,7 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 4000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 // midlewear
 app.use(express.json());
@@ -46,6 +46,18 @@ async function run() {
 
             const result = await productsCollection.find(query).toArray();
             res.send(result);
+        });
+        // get product details by id
+        app.get("/product/:id", async (req, res) => {
+            const id = req.params.id;
+            const product = await productsCollection.findOne({ _id: new ObjectId(id) });
+            res.json(product);
+        });
+        // add product from client 
+        app.post("/addProduct", async (req, res) => {
+            const product = req.body;
+            const result = await productsCollection.insertOne(product);
+            res.json(result);
         });
 
         await client.db("admin").command({ ping: 1 });
