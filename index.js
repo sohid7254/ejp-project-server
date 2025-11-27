@@ -63,20 +63,22 @@ async function run() {
         });
         // Buy product to show
         app.get("/buy", async(req, res) => {
-            const products = await purchasedProducts.find().toArray();
+            const email = req.query.email;
+            const products = await purchasedProducts.find({email}).toArray();
             res.send(products)
         })
 
         // Buy Product
         app.post("/buy", async(req, res) => {
-            const { title, price } = req.body;
-            const result = await purchasedProducts.insertOne({ title, price });
+            const { title, price, email } = req.body;
+            const result = await purchasedProducts.insertOne({ title, price, email });
             res.send(result)
         })
         // delete bought product
         app.delete("/buy/:id", async(req, res) => {
             const id = req.params.id;
-            const result = await purchasedProducts.deleteOne({_id : new ObjectId(id)})
+            const email = req.query.email
+            const result = await purchasedProducts.deleteOne({_id : new ObjectId(id),email:email})
             res.send(result)
         })
 
