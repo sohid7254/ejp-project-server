@@ -26,6 +26,7 @@ async function run() {
 
         const db = client.db("ejp-project");
         const productsCollection = db.collection("products");
+        const purchasedProducts = db.collection("boughtProducts")
 
         // get products
 
@@ -60,13 +61,31 @@ async function run() {
             const result = await productsCollection.insertOne(product);
             res.json(result);
         });
+        // Buy product to show
+        app.get("/buy", async(req, res) => {
+            const products = await purchasedProducts.find().toArray();
+            res.send(products)
+        })
+
+        // Buy Product
+        app.post("/buy", async(req, res) => {
+            const { title, price } = req.body;
+            const result = await purchasedProducts.insertOne({ title, price });
+            res.send(result)
+        })
+        // delete bought product
+        app.delete("/buy/:id", async(req, res) => {
+            const id = req.params.id;
+            const result = await purchasedProducts.deleteOne({_id : new ObjectId(id)})
+            res.send(result)
+        })
 
         //  Delete product
-        app.delete("/product/:id", async (req, res) => {
-            const id = req.params.id;
-            const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
-            res.json(result);
-        });
+        // app.delete("/product/:id", async (req, res) => {
+        //     const id = req.params.id;
+        //     const result = await productsCollection.deleteOne({ _id: new ObjectId(id) });
+        //     res.json(result);
+        // });
 
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
